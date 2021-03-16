@@ -1,0 +1,22 @@
+{
+  "name": "rematch-demo",
+  "description": "Count example of Rematch",
+  "version": "0.0.8",
+  "dependencies": {
+    "@rematch/core": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-redux": "latest",
+    "redux": "latest",
+    "redux-logger": "^3.0.6"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
