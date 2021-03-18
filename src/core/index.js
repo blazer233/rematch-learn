@@ -64,22 +64,16 @@ Rematch.prototype.getModels = function (models) {
 Rematch.prototype.addModel = function (model) {
   this.forEachPlugin("onModel", onModel => onModel(model));
 };
-Rematch.prototype.createRedux = function ({ redux, models }) {
-  console.log(redux, models);
-  var combineReducers$1 = redux.combineReducers || combineReducers;
-  var createStore$1 = redux.createStore || createStore;
-  var initialState = redux.initialState ? redux.initialState : {};
-  this.reducers = redux.reducers;
+Rematch.prototype.createRedux = function ({
+  redux: { initialState = {}, reducers, rootReducers, middlewares },
+  models,
+}) {
+  this.reducers = reducers;
   // combine models to generate reducers
-  this.mergeReducers = function (nextReducers) {
-    if (!nextReducers) nextReducers = {};
-    // Object.assign new reducers with existing reducers
+  this.mergeReducers = function (nextReducers = {}) {
     this.reducers = Object.assign(this.reducers, nextReducers, {});
-    if (!Object.keys(this.reducers).length) {
-      // no reducers, just return state
-      return state => state;
-    }
-    return combineReducers$1(this.reducers);
+    if (!Object.keys(this.reducers).length) return state => state;
+    return combineReducers(this.reducers);
   };
   this.createModelReducer = function ({
     baseReducer,
@@ -88,44 +82,40 @@ Rematch.prototype.createRedux = function ({ redux, models }) {
     state: modelState,
   }) {
     var modelReducers = {};
+    var combinedReducer = function (state = modelState, action) {
+      //action:{type: "@@redux/INITb.3.f.g.m.d"}
+      if (typeof modelReducers[action.type] === "function") {
+        return modelReducers[action.type](state, action.payload, action.meta);
+      }
+      return state;
+    };
     Object.keys(reducers || {}).forEach(modelAction => {
       var action = modelAction.includes("/")
         ? modelAction
         : name + "/" + modelAction;
       modelReducers[action] = reducers[modelAction];
     });
-    var combinedReducer = function (state, action) {
-      //action:{type: "@@redux/INITb.3.f.g.m.d"}
-      if (!state) state = modelState;
-      // 异步
-      if (typeof modelReducers[action.type] === "function") {
-        return modelReducers[action.type](state, action.payload, action.meta);
-      }
-      return state;
-    };
-    this.reducers[name] = !baseReducer
-      ? combinedReducer
-      : (state, action) => combinedReducer(baseReducer(state, action), action);
+    this.reducers[name] = baseReducer
+      ? (state, action) => combinedReducer(baseReducer(state, action), action)
+      : combinedReducer;
   };
   // initialize model reducers
   models.forEach(model => this.createModelReducer(model));
   this.createRootReducer = function (rootReducers) {
-    if (!rootReducers) rootReducers = {};
     var mergedReducers = this.mergeReducers();
-    if (Object.keys(rootReducers).length) {
-      return function (state, action) {
-        var rootReducerAction = rootReducers[action.type];
-        if (rootReducers[action.type]) {
-          return mergedReducers(rootReducerAction(state, action), action);
-        }
-        return mergedReducers(state, action);
-      };
-    }
-    return mergedReducers;
+    return (state, action) => {
+      var rootReducerAction = rootReducers[action.type];
+      if (rootReducers[action.type]) {
+        return mergedReducers(rootReducerAction(state, action), action);
+      }
+      return mergedReducers(state, action);
+    };
   };
-  var rootReducer = this.createRootReducer(redux.rootReducers);
-  var middlewares = applyMiddleware.apply(Redux, redux.middlewares);
-  this.store = createStore$1(rootReducer, initialState, middlewares);
+  var rootReducer = Object.keys(rootReducers).length
+    ? this.createRootReducer(rootReducers)
+    : this.mergeReducers();
+  var middlewares = applyMiddleware.apply(Redux, middlewares);
+  this.store = createStore(rootReducer, initialState, middlewares);
   return this;
 };
 Rematch.prototype.init = function () {
@@ -149,11 +139,9 @@ Rematch.prototype.init = function () {
   );
   this.forEachPlugin("onStoreCreated", function (onStoreCreated) {
     var returned = onStoreCreated(rematchStore);
-    if (returned) {
-      Object.keys(returned || {}).forEach(function (key) {
-        rematchStore[key] = returned[key];
-      });
-    }
+    Object.keys(returned).forEach(key => {
+      rematchStore[key] = returned[key];
+    });
   });
   return rematchStore;
 };
@@ -162,6 +150,5 @@ export const init = (initConfig, npmhanlder) => {
   count += 1;
   var name = initConfig.name || count;
   var config = mergeConfig({ ...initConfig, name, npmhanlder });
-  console.log(initConfig, config);
   return new Rematch(config).init();
 };
