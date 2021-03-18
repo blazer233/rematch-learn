@@ -1,4 +1,5 @@
 // function to create a one second delay
+
 const delay = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
 // count model
@@ -12,9 +13,8 @@ export const count = {
       return state + payload;
     },
   },
-  effects: {
+  effects: dispatch => ({
     async addByAsync(payload, state) {
-      console.log(payload, state);
       await delay(1000);
       this.addBy(1);
     },
@@ -22,5 +22,5 @@ export const count = {
       await delay(2000);
       this.addBy(2);
     },
-  },
+  }),
 };

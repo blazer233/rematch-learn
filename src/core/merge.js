@@ -1,5 +1,5 @@
 /**
- * merge init configs together
+ * merge
  */
 export const mergeConfig = function (initConfig) {
   var config = {
@@ -10,8 +10,7 @@ export const mergeConfig = function (initConfig) {
       initConfig.redux
     ),
   };
-  for (var _i = 0, _a = config.plugins; _i < _a.length; _i++) {
-    var plugin = _a[_i];
+  config.plugins.forEach(plugin => {
     if (plugin.config) {
       // models
       var models = Object.assign(config.models, plugin.config.models);
@@ -44,6 +43,6 @@ export const mergeConfig = function (initConfig) {
           config.redux.createStore || plugin.config.redux.createStore;
       }
     }
-  }
+  });
   return config;
 };

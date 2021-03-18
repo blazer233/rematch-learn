@@ -1,4 +1,3 @@
-import { __awaiter, __generator, __spreadArrays } from "./util";
 /**
  * Effects Plugin
  *插件及处理异步action
@@ -6,60 +5,37 @@ import { __awaiter, __generator, __spreadArrays } from "./util";
 export const effectsPlugin = {
   exposed: {
     // exposed：暴露给全局的属性和方法，可以理解为占位符，用于数据的共享
-    // expose effects for access from dispatch plugin
+    // 使得effects 可以通过this.effects获得
     effects: {},
   },
-  // add effects to dispatch so that dispatch[modelName][effectName] calls an effect
-  onModel: function (model) {
-    if (!model.effects) {
-      return;
-    }
+  // 将每个model上的effects添加到dispatch上，这样可以通过dispatch[modelName][effectName]来调用effect方法
+  onModel: function ({ name, effects }) {
+    if (!effects) return;
+    console.log(this, this.dispatch[name]);
+    // model的effects可以是一个对象，或者是一个返回对象的函数，这个函数的参数是全局的dispatch方法
     var effects =
-      typeof model.effects === "function"
-        ? model.effects(this.dispatch)
-        : model.effects;
-    for (var _i = 0, _a = Object.keys(effects); _i < _a.length; _i++) {
-      var effectName = _a[_i];
-      this.effects[model.name + "/" + effectName] = effects[effectName].bind(
-        this.dispatch[model.name]
+      typeof effects === "function" ? effects(this.dispatch) : effects;
+    Object.keys(effects).forEach(effectName => {
+      this.effects[name + "/" + effectName] = effects[effectName].bind(
+        this.dispatch[name]
       );
-      // add effect to dispatch
-      // is assuming dispatch is available already... that the dispatch plugin is in there
-      this.dispatch[model.name][effectName] = this.createDispatcher.apply(
-        this,
-        [model.name, effectName]
-      );
-      // tag effects so they can be differentiated from normal actions
-      this.dispatch[model.name][effectName].isEffect = true;
-    }
+      this.dispatch[name][effectName] = this.createDispatcher(name, effectName);
+      // isEffect用来区分是普通的action，还是异步的，后面的loading插件就是通过这个字段来判断是不是异步操作
+      this.dispatch[name][effectName].isEffect = true;
+    });
   },
   // process async/await actions
   middleware: function (store) {
-    var _this = this;
-    return function (next) {
-      return function (action) {
-        return __awaiter(_this, void 0, void 0, function () {
-          return __generator(this, function (_a) {
-            switch (_a.label) {
-              case 0:
-                if (!(action.type in this.effects)) return [3 /*break*/, 2];
-                return [4 /*yield*/, next(action)];
-              case 1:
-                _a.sent();
-                return [
-                  2 /*return*/,
-                  this.effects[action.type](
-                    action.payload,
-                    store.getState(),
-                    action.meta
-                  ),
-                ];
-              case 2:
-                return [2 /*return*/, next(action)];
-            }
-          });
-        });
-      };
+    return next => action => {
+      if (action.type in this.effects) {
+        // 会把全局的state作为effect方法的第二个参数传入
+        return this.effects[action.type](
+          action.payload,
+          store.getState(),
+          action.meta
+        );
+      }
+      return next(action);
     };
   },
 };
