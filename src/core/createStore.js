@@ -1,5 +1,5 @@
 import ActionTypes from "./common.js";
-
+//实现最简redux
 export const createStore = function (reducer, preloadedState, enhancer) {
   if (typeof preloadedState === "function" && typeof enhancer === "undefined") {
     enhancer = preloadedState;

@@ -20,8 +20,6 @@ export const effectsPlugin = {
         this.dispatch[name]
       );
       this.dispatch[name][effectName] = this.createDispatcher(name, effectName);
-      // isEffect用来区分是普通的action，还是异步的，后面的loading插件就是通过这个字段来判断是不是异步操作
-      this.dispatch[name][effectName].isEffect = true;
     });
   },
   // process async/await actions

@@ -32,23 +32,16 @@ function Rematch(config) {
     this.plugins.push(result);
     console.log(item, result);
   });
-  this.forEachPlugin(
-    "middleware",
-    (middleware, arg) => {
-      if (Array.isArray(arg) && arg.every(i => typeof i == "function")) {
-        this.config.redux.middlewares.push(middleware, ...arg);
-      }
-      this.config.redux.middlewares.push(middleware);
-    },
-    this.config.npmhanlder
-  );
+  this.forEachPlugin("middleware", middleware => {
+    this.config.redux.middlewares.push(middleware);
+  });
 }
-Rematch.prototype.forEachPlugin = function (method, fn, arg) {
+Rematch.prototype.forEachPlugin = function (method, fn) {
   /**
    * this.plugins=[{onModel: ƒ, onStoreCreated: ƒ},{onModel: ƒ, middleware: ƒ}]
    */
   this.plugins.forEach(plugin => {
-    if (plugin[method]) fn(plugin[method], arg);
+    if (plugin[method]) fn(plugin[method]);
   });
 };
 //合并插件
@@ -145,10 +138,10 @@ Rematch.prototype.init = function () {
   });
   return rematchStore;
 };
-export const init = (initConfig, npmhanlder) => {
+export const init = initConfig => {
   if (!initConfig) initConfig = {};
   count += 1;
   var name = initConfig.name || count;
-  var config = mergeConfig({ ...initConfig, name, npmhanlder });
+  var config = mergeConfig({ ...initConfig, name });
   return new Rematch(config).init();
 };

@@ -4,16 +4,16 @@ import ReactDOM from "react-dom";
 import { init } from "./core";
 import { Provider } from "react-redux";
 import { len, num } from "./models";
-import Count from "./Count";
-import Len from "./Len";
+import Count from "./components/Count";
+import Len from "./components/Len";
 import logger from "redux-logger";
-let ApplyMiddleware = [
+let middlewares = [
   store => next => action => {
     console.log("打点 >>>");
     next(action);
     console.log("打点 <<<");
   },
-  store => next => action => {
+  ({ getState, dispatch }) => next => action => {
     console.log("日志 >>>");
     next(action);
     console.log("日志 <<<");
@@ -27,12 +27,10 @@ let ApplyMiddleware = [
     return next(action);
   },
 ];
-const store = init(
-  {
-    models: { len, num },
-  },
-  ApplyMiddleware
-);
+const store = init({
+  models: { len, num },
+  redux: { middlewares },
+});
 window.store = store;
 ReactDOM.render(
   <Provider store={store}>
