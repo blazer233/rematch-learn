@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 // import { init } from "@rematch/core";
 // import init from "./kf_redux/core";
-import { init } from "./core";
+import init from "./core";
 import { Provider } from "react-redux";
 import { len, num } from "./models";
 import Count from "./components/Count";
@@ -32,7 +32,7 @@ const store = init({
   models: { len, num },
   // redux: { middlewares },
 });
-console.log(store)
+console.log(store);
 window.store = store;
 ReactDOM.render(
   <Provider store={store}>

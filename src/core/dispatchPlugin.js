@@ -26,7 +26,6 @@ export const dispatchPlugin = {
   },
   // 对model上的每个reducer创建action createor，并挂载到dispatch对象上
   onModel: function ({ name, reducers }) {
-    console.log(this);
     this.dispatch[name] = {};
     if (!reducers) return;
     /**

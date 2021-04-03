@@ -8,6 +8,7 @@ export const pluginFactory = function (config) {
       let result = {};
       let exposed = plugin.exposed;
       if (exposed) {
+        //在this上挂在函数
         Object.keys(exposed).forEach(key => {
           this[key] =
             typeof exposed[key] === "function"
@@ -15,16 +16,11 @@ export const pluginFactory = function (config) {
               : Object.create(exposed[key]); // add exposed to plugin class
         });
       }
-      for (
-        var _b = 0, _c = ["onModel", "middleware", "onStoreCreated"];
-        _b < _c.length;
-        _b++
-      ) {
-        var method = _c[_b];
-        if (plugin[method]) {
-          result[method] = plugin[method].bind(this);
+      ["onModel", "middleware", "onStoreCreated"].forEach(i => {
+        if (plugin[i]) {
+          result[i] = plugin[i].bind(this);
         }
-      }
+      });
       return result;
     },
   };

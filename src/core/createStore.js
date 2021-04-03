@@ -1,4 +1,3 @@
-import ActionTypes from "./common.js";
 //实现最简redux
 export const createStore = function (reducer, preloadedState, enhancer) {
   if (typeof preloadedState === "function" && typeof enhancer === "undefined") {
@@ -16,9 +15,7 @@ export const createStore = function (reducer, preloadedState, enhancer) {
     currentListeners.forEach(listener => listener());
     return action;
   };
-  dispatch({
-    type: ActionTypes.INIT,
-  });
+  dispatch({});
   return {
     dispatch,
     subscribe,
