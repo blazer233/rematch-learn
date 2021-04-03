@@ -1,4 +1,3 @@
-import { __awaiter, __generator } from "./util";
 import { pluginFactory } from "./pluginFactory.js";
 import { dispatchPlugin } from "./dispatchPlugin.js";
 import { effectsPlugin } from "./effectsPlugin.js";
@@ -6,18 +5,17 @@ import ActionTypes from "./common.js";
 import { createStore, compose, applyMiddleware } from "./createStore.js";
 import combineReducers from "./combineReducers.js";
 import bindActionCreators from "./thunk.js";
-import { mergeConfig } from "./merge";
-var Redux = Object.freeze({
+import mergeConfig from "./merge";
+let Redux = Object.freeze({
   __proto__: null,
-  __DO_NOT_USE__ActionTypes: ActionTypes,
   applyMiddleware,
   bindActionCreators,
   combineReducers,
   compose,
   createStore,
 });
-var count = 0;
-var corePlugins = [dispatchPlugin, effectsPlugin];
+let count = 0;
+let corePlugins = [dispatchPlugin, effectsPlugin];
 /**
  * Rematch class
  */
@@ -26,7 +24,7 @@ function Rematch(config) {
   this.plugins = [];
   this.config = { ...config, plugins: config.plugins.concat(corePlugins) };
   this.pluginFactory = pluginFactory(config);
-  console.log(this.pluginFactory);
+  console.log(this.config,this.pluginFactory);
   this.config.plugins.forEach(item => {
     let result = this.pluginFactory.create(item);
     this.plugins.push(result);
@@ -74,8 +72,8 @@ Rematch.prototype.createRedux = function ({
     name,
     state: modelState,
   }) {
-    var modelReducers = {};
-    var combinedReducer = function (state = modelState, action) {
+    let modelReducers = {};
+    let combinedReducer = function (state = modelState, action) {
       //action:{type: "@@redux/INITb.3.f.g.m.d"}
       if (typeof modelReducers[action.type] === "function") {
         return modelReducers[action.type](state, action.payload, action.meta);
@@ -83,7 +81,7 @@ Rematch.prototype.createRedux = function ({
       return state;
     };
     Object.keys(reducers || {}).forEach(modelAction => {
-      var action = modelAction.includes("/")
+      let action = modelAction.includes("/")
         ? modelAction
         : name + "/" + modelAction;
       modelReducers[action] = reducers[modelAction];
@@ -95,16 +93,16 @@ Rematch.prototype.createRedux = function ({
   // initialize model reducers
   models.forEach(model => this.createModelReducer(model));
   this.createRootReducer = function (rootReducers) {
-    var mergedReducers = this.mergeReducers();
+    let mergedReducers = this.mergeReducers();
     return (state, action) => {
-      var rootReducerAction = rootReducers[action.type];
+      let rootReducerAction = rootReducers[action.type];
       if (rootReducers[action.type]) {
         return mergedReducers(rootReducerAction(state, action), action);
       }
       return mergedReducers(state, action);
     };
   };
-  var rootReducer = Object.keys(rootReducers).length
+  let rootReducer = Object.keys(rootReducers).length
     ? this.createRootReducer(rootReducers)
     : this.mergeReducers();
   var middlewares = applyMiddleware.apply(Redux, middlewares);
@@ -115,11 +113,11 @@ Rematch.prototype.init = function () {
   this.models = this.getModels(this.config.models) || [];
   this.models.forEach(model => this.addModel(model));
   console.log(this.config.models, this.models);
-  var redux = this.createRedux({
+  let redux = this.createRedux({
     redux: this.config.redux,
     models: this.models,
   });
-  var rematchStore = Object.assign(
+  let rematchStore = Object.assign(
     redux.store,
     { name: this.config.name },
     {
@@ -131,17 +129,17 @@ Rematch.prototype.init = function () {
     }
   );
   this.forEachPlugin("onStoreCreated", function (onStoreCreated) {
-    var returned = onStoreCreated(rematchStore);
-    Object.keys(returned).forEach(key => {
-      rematchStore[key] = returned[key];
-    });
+    let complexDispatch = onStoreCreated(rematchStore); //返回改造后的dispatch
+    Object.keys(complexDispatch).forEach(dispatch => {
+      rematchStore[dispatch] = complexDispatch[dispatch];
+    }); //将改造后的dispatch注入rematch
   });
   return rematchStore;
 };
 export const init = initConfig => {
   if (!initConfig) initConfig = {};
   count += 1;
-  var name = initConfig.name || count;
-  var config = mergeConfig({ ...initConfig, name });
+  let name = initConfig.name || count;
+  let config = mergeConfig({ ...initConfig, name });
   return new Rematch(config).init();
 };

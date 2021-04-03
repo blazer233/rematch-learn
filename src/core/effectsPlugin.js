@@ -11,15 +11,13 @@ export const effectsPlugin = {
   // 将每个model上的effects添加到dispatch上，这样可以通过dispatch[modelName][effectName]来调用effect方法
   onModel: function ({ name, effects }) {
     if (!effects) return;
-    console.log(this, this.dispatch[name]);
     // model的effects可以是一个对象，或者是一个返回对象的函数，这个函数的参数是全局的dispatch方法
-    var effects =
-      typeof effects === "function" ? effects(this.dispatch) : effects;
-    Object.keys(effects).forEach(effectName => {
-      this.effects[name + "/" + effectName] = effects[effectName].bind(
-        this.dispatch[name]
-      );
+    let _effects =
+      typeof effects == "function" ? effects(this.dispatch) : effects || {};
+    Object.keys(_effects).forEach(effectName => {
+      this.effects[name + "/" + effectName] = _effects[effectName].bind(this.dispatch[name]);
       this.dispatch[name][effectName] = this.createDispatcher(name, effectName);
+      console.log(this)
     });
   },
   // process async/await actions

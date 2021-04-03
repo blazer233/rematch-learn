@@ -1,7 +1,7 @@
 /**
  * merge
  */
-export const mergeConfig = function (initConfig) {
+export default function (initConfig) {
   var config = {
     ...initConfig,
     plugins: [],
@@ -45,4 +45,4 @@ export const mergeConfig = function (initConfig) {
     }
   });
   return config;
-};
+}

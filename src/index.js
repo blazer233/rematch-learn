@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 // import { init } from "@rematch/core";
+// import init from "./kf_redux/core";
 import { init } from "./core";
 import { Provider } from "react-redux";
 import { len, num } from "./models";
@@ -29,8 +30,9 @@ let middlewares = [
 ];
 const store = init({
   models: { len, num },
-  redux: { middlewares },
+  // redux: { middlewares },
 });
+console.log(store)
 window.store = store;
 ReactDOM.render(
   <Provider store={store}>

@@ -14,7 +14,8 @@ export const len = {
     },
   },
   effects: dispatch => ({
-    async addByAsync(payload, state) {
+    async addByAsync(dispatch,payload, state) {
+      console.log(dispatch,payload, state)
       await delay(1000);
       this.addBy(1);
     },
@@ -36,6 +37,7 @@ export const num = {
   },
   effects: dispatch => ({
     async addByAsyncnum(payload, state) {
+      //当前dispatch是经过加工的dispatch
       await delay(1000);
       this.addBynum(1);
     },

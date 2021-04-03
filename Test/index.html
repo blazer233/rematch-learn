@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+    import init from "../src/kf_redux/core.js";
+import { len, num } from "../src/models.js";
+
+const mainObj = {};
+const store = init({
+  models: { len, num },
+});
+const connectRedux = () => ({
+  stateMap: state => ({ len: state.len }),
+  dispatchMap: dispatch => ({ addBy: dispatch.len.addBy }),
+});
+
+
+let { stateMap, dispatchMap } = connectRedux();
+if (dispatchMap && typeof dispatchMap == "function") {
+  let funcs = dispatchMap(store.dispatch);
+  Object.keys(funcs).forEach(name => (mainObj[name] = funcs[name]));
+}
+if (stateMap && typeof stateMap == "function") {
+  let newData = stateMap(store.state) || {};
+  Object.keys(newData).forEach(name => (mainObj[name] = newData[name]));
+}
+
+
+
+console.log(mainObj);
+
+    </script>
+</body>
+
+</html>
