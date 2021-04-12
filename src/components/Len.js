@@ -6,18 +6,18 @@ import {
   addByAsyncAction,
   addByTwoAsyncAction,
 } from "../reduxStore/action";
+let mapState;
+let mapDispatch;
+
 const Count = props => (
   <div style={{ textAlign: "center", marginTop: "20rem" }}>
-    <h1>The count is: {props.len}</h1>
+    <h1>The len is: {props.len}</h1>
     <button onClick={props.addByOne}>Add 1</button>
     <button onClick={props.addByTwo}>Add 2</button>
     <button onClick={props.addByOneAsync}>Add 1 Async</button>
     <button onClick={props.addByTwoAsync}>Add 2 Async</button>
   </div>
 );
-
-let mapState;
-let mapDispatch;
 
 if (process.env.REACT_APP_ENV == "rematch") {
   mapState = state => ({
