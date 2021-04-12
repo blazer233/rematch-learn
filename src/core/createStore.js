@@ -13,7 +13,8 @@ export const createStore = function (reducer, preloadedState, enhancer) {
   const dispatch = action => {
     currentState = currentReducer(currentState, action); // 覆盖原对象
     currentListeners.forEach(listener => listener());
-    return action;
+    // console.log(action)
+    // return action;
   };
   dispatch({});
   return {
@@ -29,7 +30,7 @@ export const applyMiddleware = (...middlewares) => createStore => reducer => {
   var chain = [];
   var middlewareAPI = {
     getState: store.getState,
-    dispatch: reducer => dispatch(reducer),
+    dispatch: action => dispatch(action),
   };
   chain = middlewares.map(middleware => middleware(middlewareAPI));
   dispatch = compose(...chain)(store.dispatch);

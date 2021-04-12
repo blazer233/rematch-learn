@@ -4,17 +4,20 @@
   "version": "0.0.8",
   "dependencies": {
     "@rematch/core": "latest",
+    "cross-env": "^7.0.3",
     "react": "latest",
     "react-dom": "latest",
     "react-redux": "latest",
-    "redux": "latest",
-    "redux-logger": "^3.0.6"
+    "redux": "^4.0.5",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "react-scripts": "1.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "rematch": "cross-env REACT_APP_ENV=rematch react-scripts start",
+    "redux": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

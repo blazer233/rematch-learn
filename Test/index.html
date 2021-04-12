@@ -2,16 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 
 <body>
-    <script type="module">
-    import init from "../src/kf_redux/core.js";
+  <script type="module">
+import init from "../src/kf_redux/core.js";
 import { len, num } from "../src/models.js";
-
+import deepDiff from '../src/kf_redux/diff.js';
 const mainObj = {};
 const store = init({
   models: { len, num },
@@ -28,13 +28,27 @@ if (dispatchMap && typeof dispatchMap == "function") {
   Object.keys(funcs).forEach(name => (mainObj[name] = funcs[name]));
 }
 if (stateMap && typeof stateMap == "function") {
-  let newData = stateMap(store.state) || {};
-  Object.keys(newData).forEach(name => (mainObj[name] = newData[name]));
+  // let newData = stateMap(store.state) || {};
+  // Object.keys(newData).forEach(name => (mainObj[name] = newData[name]));
+  let newData = {};
+newData = stateMap(store.state, mainObj);
+let newKeys = Object.keys(newData);
+let oldData = {};
+newKeys.forEach(i => oldData[i] = mainObj[i]);
+let diffKeys = [];
+let diff = deepDiff(oldData, newData);
+diffKeys = Object.keys(diff);
+if (diffKeys.length) {
+  diffKeys.forEach(k => {
+    mainObj[k] = newData[k]
+  });
 }
 
-
-
+}
+mainObj.addBy(1)
+setTimeout(() => {
 console.log(mainObj);
+}, 2000);
 
     </script>
 </body>

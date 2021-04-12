@@ -14,8 +14,8 @@ export const len = {
     },
   },
   effects: dispatch => ({
-    async addByAsync(dispatch,payload, state) {
-      console.log(dispatch,payload, state)
+    async addByAsync(payload, state) {
+      console.log(this, dispatch, payload, state);
       await delay(1000);
       this.addBy(1);
     },

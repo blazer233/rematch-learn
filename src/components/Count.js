@@ -1,6 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-
+import {
+  addBynumAction,
+  addByTwonumAction,
+  addByAsyncnumAction,
+  addByTwoAsyncnumAction,
+} from "../reduxStore/action";
 const Count = props => (
   <div style={{ textAlign: "center", marginTop: "20rem" }}>
     <h1>The count is: {props.num}</h1>
@@ -11,17 +16,28 @@ const Count = props => (
   </div>
 );
 
-const mapState = state => ({
-  num: state.num,
-});
+let mapState;
+let mapDispatch;
 
-const mapDispatch = ({
-  num: { addBynum, addByTwonum, addByAsyncnum, addByTwoAsyncnum },
-}) => ({
-  addByOne: () => addBynum(1),
-  addByTwo: () => addByTwonum(2),
-  addByOneAsync: () => addByAsyncnum(1),
-  addByTwoAsync: () => addByTwoAsyncnum(1),
-});
-
+if (process.env.REACT_APP_ENV == "rematch") {
+  mapState = state => ({
+    num: state.num,
+  });
+  mapDispatch = dispatch => ({
+    addByOne: () => dispatch.num.addBynum(1),
+    addByTwo: () => dispatch.num.addByTwonum(2),
+    addByOneAsync: () => dispatch.num.addByAsyncnum(1),
+    addByTwoAsync: () => dispatch.num.addByTwoAsyncnum(1),
+  });
+} else {
+  mapState = state => ({
+    num: state.num.state,
+  });
+  mapDispatch = dispatch => ({
+    addByOne: () => dispatch(addBynumAction()),
+    addByTwo: () => dispatch(addByTwonumAction()),
+    addByOneAsync: () => dispatch(addByAsyncnumAction()),
+    addByTwoAsync: () => dispatch(addByTwoAsyncnumAction()),
+  });
+}
 export default connect(mapState, mapDispatch)(Count);

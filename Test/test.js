@@ -1,21 +1,32 @@
-import init from "../src/kf_redux/core.js";
-import { len, num } from "../src/models.js";
-
-const mainObj = {};
-const store = init({
-  models: { len, num },
+let newData = {};
+newData = stateMap(state, mainObj);
+let newKeys = Object.keys(newData);
+let oldData = {};
+newKeys.forEach(i => {
+  oldData[i] = mainObj.data[i];
 });
-const connectRedux = () => ({
-  stateMap: state => ({ allstate: state }),
-  dispatchMap: dispatch => ({ getdispatchs: dispatch }),
-});
-let { stateMap, dispatchMap } = connectRedux();
-if (dispatchMap && typeof dispatchMap == "function") {
-  let funcs = dispatchMap(store.dispatch);
-  Object.keys(funcs).forEach(name => (mainObj[name] = funcs[name]));
+let diffKeys = [];
+let diff = deepDiff(oldData, newData);
+diffKeys = Object.keys(diff);
+if (diffKeys.length) {
+  let tmp = {};
+  diffKeys.forEach(k => {
+    tmp[k] = newData[k];
+  });
+  console.log(tmp);
 }
-if (stateMap && typeof stateMap == "function") {
-  let newData = stateMap(store.state) || {};
-  Object.keys(newData).forEach(name => (mainObj[name] = newData[name]));
+function clone(target, map = new WeakMap()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = clone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
 }
-console.log(mainObj);
